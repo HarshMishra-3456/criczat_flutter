@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255887474971",
+    "project_id": "criczat-766f0",
+    "storage_bucket": "criczat-766f0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255887474971:android:cb9b0d4bddae4b374713be",
+        "android_client_info": {
+          "package_name": "com.criczatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsNzTC9AweBGEz8J1w02tWH8GU9e_Ag1s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
