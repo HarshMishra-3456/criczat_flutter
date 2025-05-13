@@ -354,8 +354,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                               constToast("you don't have  valid  wallet amount");
 
                                                             }else {
-                                                              constToast("Success");
-                                                              // getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');
+                                                              // constToast("Success");
+                                                              getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');
                                                             }
                                                           },
                                                           child: Center(
