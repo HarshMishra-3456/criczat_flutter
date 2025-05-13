@@ -16,6 +16,8 @@ import 'package:tempalteflutter/modules/myProfile/views/screens/myProfileScreen.
 import 'package:tempalteflutter/modules/myProfile/views/screens/mywallet.dart';
 import 'package:tempalteflutter/modules/myProfile/views/screens/notificationScreen.dart';
 import 'package:tempalteflutter/modules/phoneauth/PhoneValidationScreen.dart';
+import 'package:tempalteflutter/modules/pymentOptions/PreferenceManager.dart';
+import 'package:tempalteflutter/modules/withdrawl_request/WithDrawlRequestScreen.dart';
 import 'package:tempalteflutter/utils/avatarImage.dart';
 import 'package:tempalteflutter/constance/global.dart' as globals;
 
@@ -81,7 +83,12 @@ class _AppDrawerState extends State<AppDrawer> {
                     Divider(
                       height: 1,
                     ),
+                    myWithDrawals(),
+                    Divider(
+                      height: 1,
+                    ),
                     logoutButton(),
+
                     Expanded(child: SizedBox()),
                     Padding(
                       padding: const EdgeInsets.only(left: 10),
@@ -840,6 +847,55 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
+
+  Widget myWithDrawals() {
+    return Container(
+      height: 54,
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Withdrawlrequestscreen(),
+              fullscreenDialog: true,
+            ),
+          );
+        },
+        child: Padding(
+          padding: EdgeInsets.only(left: 14, right: 14),
+          child: new Row(
+            children: <Widget>[
+              Container(
+                child: Icon(
+                  Icons.money,
+                  color: Colors.black,
+                  size: 26,
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Container(
+                  child: Text(
+                    'My Withdrawals',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget myProfile() {
     return Container(
       height: 54,
@@ -943,6 +999,7 @@ class LogoutDialog extends StatelessWidget {
         TextButton(
           onPressed: () async{
             await Storage().deleteItem('userid');
+            PreferenceManager.instance.logout();
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -950,6 +1007,7 @@ class LogoutDialog extends StatelessWidget {
                 ),
                     (route) => false
             );
+
           },
           child: const Text('Yes'),
         ),

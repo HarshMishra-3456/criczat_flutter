@@ -1,6 +1,9 @@
 // ignore_for_file: unnecessary_null_comparison, deprecated_member_use
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:tempalteflutter/api/apiProvider.dart';
 import 'package:tempalteflutter/constance/constance.dart';
@@ -11,6 +14,8 @@ import 'package:tempalteflutter/models/userData.dart';
 import 'package:provider/provider.dart';
 import 'package:tempalteflutter/modules/myProfile/data/userwalletapi.dart';
 import 'package:tempalteflutter/modules/myProfile/views/provider/getuserprovider.dart';
+import 'package:http/http.dart' as http;
+import 'package:tempalteflutter/modules/pymentOptions/PreferenceManager.dart';
 
 class WithdrawScreen extends StatefulWidget {
   @override
@@ -21,6 +26,11 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   var paymet = '';
   var isProsses = false;
   var paymentController = new TextEditingController();
+  var nameController = new TextEditingController();
+  var accNoController = new TextEditingController();
+  var ifscController = new TextEditingController();
+  var bankNameController = new TextEditingController();
+  var upiIDController = new TextEditingController();
   List<AccountDetail> accountDetailList = <AccountDetail>[];
   // UserData user = new UserData();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -29,6 +39,14 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   void initState() {
     paymentController.text = paymet;
     super.initState();
+    PreferenceManager.instance.getString("BANK").then((onValue){
+      var newdata=jsonDecode(onValue);
+      nameController.text=newdata["name"];
+     accNoController.text=newdata["account_number"];
+     ifscController.text=newdata["ifsc"];
+     bankNameController.text=newdata["bank_name"];
+     upiIDController.text=newdata["upi_id"];
+    });
   }
 
   @override
@@ -181,6 +199,58 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                         //   ),
                                         //   child: bankAccountList(),
                                         // ),
+                                        textInputFiled(
+                                            nameController,
+                                            textAlign: TextAlign.left,
+                                            leftPadding: 20,
+                                            rightPadding: 20,
+                                            radius: 8,
+                                            hintText: "Enter your name",
+                                            label: Text("Name",style: TextStyle(color: AllCoustomTheme.getThemeData().primaryColor),)
+                                        ),
+                                        textInputFiled(
+                                            accNoController,
+                                            textAlign: TextAlign.left,
+                                            leftPadding: 20,
+                                            rightPadding: 20,
+                                            radius: 8,
+                                            hintText: "Enter your Account Number",
+                                            textInputType: TextInputType.number,
+                                            inputFormatters:[
+                                              FilteringTextInputFormatter.digitsOnly,
+                                              LengthLimitingTextInputFormatter(16)
+                                            ],
+                                            label: Text("Account Number",style: TextStyle(color: AllCoustomTheme.getThemeData().primaryColor),)
+                                        ),
+                                        textInputFiled(
+                                            ifscController,
+                                            textAlign: TextAlign.left,
+                                            leftPadding: 20,
+                                            rightPadding: 20,
+                                            radius: 8,
+                                            hintText: "Enter your IFSC Code",
+                                            textInputType: TextInputType.text,
+                                            label: Text("IFSC Code",style: TextStyle(color: AllCoustomTheme.getThemeData().primaryColor),)
+                                        ),
+                                        textInputFiled(
+                                            bankNameController,
+                                            textAlign: TextAlign.left,
+                                            leftPadding: 20,
+                                            rightPadding: 20,
+                                            radius: 8,
+                                            hintText: "Enter your Bank Name",
+                                            textInputType: TextInputType.text,
+                                            label: Text("Bank Name",style: TextStyle(color: AllCoustomTheme.getThemeData().primaryColor),)
+                                        ),
+                                        textInputFiled(upiIDController,
+                                            textAlign: TextAlign.left,
+                                            leftPadding: 20,
+                                            rightPadding: 20,
+                                            radius: 8,
+                                            hintText: "Enter your UPI ID",
+                                            textInputType: TextInputType.text,
+                                            label: Text("UPI ID",style: TextStyle(color: AllCoustomTheme.getThemeData().primaryColor),)
+                                        ),
                                         Padding(
                                           padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
                                           child: Container(
@@ -234,7 +304,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                         ),
                                         Container(
                                           height: 60,
-                                          padding: EdgeInsets.only(left: 50, right: 50, bottom: 20),
+                                          padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                                           child: Row(
                                             children: <Widget>[
                                               Flexible(
@@ -246,23 +316,58 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                       BoxShadow(color: Colors.black.withOpacity(0.5), offset: Offset(0, 1), blurRadius: 5.0),
                                                     ],
                                                   ),
-                                                  child: InkWell(
-                                                    borderRadius: new BorderRadius.circular(4.0),
-                                                    onTap: () async {
-                                                      clickPayment();
-                                                    },
-                                                    child: Center(
-                                                      child: isProsses ?  CircularProgressIndicator() :Text(
-                                                        'Withdraw cash'.toUpperCase(),
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight.bold,
-                                                          color: Colors.white,
-                                                          fontSize: ConstanceData.SIZE_TITLE12,
-                                                        ),
-                                                      )
-                                                    ),
-                                                  ),
+                                                  child: Consumer<GetUserDataProvider>(
+                                                      builder: (context, value, child) {
+                                                        return InkWell(
+                                                          borderRadius: new BorderRadius.circular(4.0),
+                                                          onTap: () async {
+                                                            if(nameController.text.isEmpty){
+                                                              constToast("Please Enter Name");
+                                                            }else if(accNoController.text.isEmpty){
+                                                              constToast("Please Enter Account Number");
+                                                            }else if(ifscController.text.isEmpty){
+                                                              constToast("Please Enter IFSC Code");
+
+                                                            }else if(bankNameController.text.isEmpty){
+                                                              constToast("Please Enter Bank Name");
+
+                                                            }else if(upiIDController.text.isEmpty){
+                                                              constToast("Please Enter UPI ID");
+
+                                                            }else if(paymentController.text.isEmpty){
+                                                              constToast("Please Enter Amount");
+
+                                                            }else if((double.parse(paymentController.text)<=200 && double.parse(paymentController.text)>=10000) ){
+
+                                                              constToast("Please Enter Valid Amount");
+                                                              print(double.parse(paymentController.text)>=200);
+                                                              print(double.parse(paymentController.text)<=10000);
+                                                            }
+                                                            else if(double.parse(value.cricketdata!.data.wallet is String?value.cricketdata!.data.wallet:"${value.cricketdata!.data.wallet}")<=double.parse(paymentController.text)){
+                                                              constToast("you don't have  valid  wallet amount");
+
+                                                            }
+                                                            else if((double.parse(value.cricketdata!.data.wallet is String?value.cricketdata!.data.wallet:"${value.cricketdata!.data.wallet}")-double.parse(paymentController.text)).isNegative){
+                                                              constToast("you don't have  valid  wallet amount");
+
+                                                            }else {
+                                                              getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');
+                                                            }
+                                                          },
+                                                          child: Center(
+                                                              child: isProsses ?  CircularProgressIndicator() :Text(
+                                                                'Withdraw cash'.toUpperCase(),
+                                                                style: TextStyle(
+                                                                  fontFamily: 'Poppins',
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: Colors.white,
+                                                                  fontSize: ConstanceData.SIZE_TITLE12,
+                                                                ),
+                                                              )
+                                                          ),
+                                                        );
+                                                      },
+                                                  )
                                                 ),
                                               ),
                                             ],
@@ -284,6 +389,11 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       ),
     );
   }
+
+
+
+
+
 
   // Widget bankAccountList() {
   //   var list = <Widget>[];
@@ -389,6 +499,53 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     });
   }
 
+
+
+  getWithDrawAmount(String phoneNo)async{
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('https://grextech.org/criczat/mail.php'));
+    request.body = json.encode({
+      "name": nameController.text,
+      "account_number": accNoController.text,
+      "ifsc": ifscController.text,
+      "bank_name": bankNameController.text,
+      "upi_id": upiIDController.text,
+      "amount": paymentController.text,
+      "phone_number":phoneNo
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+    var responceJsonString=await response.stream.bytesToString();
+
+    var responceMap=jsonDecode(responceJsonString);
+    print(responceJsonString);
+    if (response.statusCode == 200) {
+     if(responceMap["status"]=="success"){
+       PreferenceManager.instance.setString("BANK", jsonEncode({
+         "name": nameController.text,
+         "account_number": accNoController.text,
+         "ifsc": ifscController.text,
+         "bank_name": bankNameController.text,
+         "upi_id": upiIDController.text,
+         "amount": paymentController.text,
+         "phone_number":phoneNo
+       }));
+      constToast("Success: ${responceMap["message"]}");
+      clickPayment();
+
+     }else{
+       constToast("Error :${responceMap["message"]}");
+     }
+    }
+    else {
+      constToast("Something went wrong");
+    }
+
+  }
+
   String selectedBankId() {
     var selectedId = '';
     accountDetailList.forEach((data) {
@@ -405,7 +562,13 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       isProsses = true;
     });
     if(paymentController.text.isNotEmpty){
-      UserWalletApis().DeductAmount(paymentController.text, context);
+      await UserWalletApis().DeductAmount(paymentController.text, context);
+      // nameController.clear();
+      // accNoController.clear();
+      // ifscController.clear();
+      // bankNameController.clear();
+      // upiIDController.clear();
+      // paymentController.clear();
     }else{
       constToast('Enter The Amount');
     }
@@ -428,5 +591,87 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+
+
+  static Widget textInputFiled(TextEditingController? controller,
+      {String hintText = "",
+        String labelTextNew = "",
+        Widget? suffixIconWidget,
+        Widget? prefixIconWidget,
+        List<TextInputFormatter>? inputFormatters,
+        Widget? label,
+        bool readOnlyFiled = false,
+        bool fillColorFiled = false,
+        Color? fillColors,
+        FocusNode? focusNode,
+        bool passwordHide = false,
+        ValueChanged? onFieldSubmitTap,
+        TextInputType? textInputType,
+        int? maxLine,
+        int? minLine,
+        bool? enabledBox,
+        FormFieldValidator<String>? validator,
+        void Function()? onTapFunction,
+        void Function(String)? onChanged,
+        double? topPadding,
+        double? radius,
+        double? bottomPadding,
+        double? leftPadding,
+        Color? cursorColor,
+        Color? mainColor,
+        double? rightPadding,
+        TextAlign? textAlign,
+        EdgeInsets? contentPadding,
+
+        bool isMandatory = false,
+        bool autoFocus = false,
+        bool enableBorder= true,
+        TextCapitalization? textCapitalization}) {
+    return Padding(
+      padding: EdgeInsets.only(left: leftPadding ?? 0, right: rightPadding ?? 0, top: topPadding ?? 20, bottom: bottomPadding ?? 0),
+      child: TextFormField(
+        textAlign: textAlign!,
+        onTap: onTapFunction,
+        focusNode: focusNode,
+        controller: controller,
+        enabled: enabledBox,
+        obscureText: passwordHide,
+        onChanged: onChanged,
+        cursorColor:Colors.black,
+        onFieldSubmitted: onFieldSubmitTap,
+        readOnly: readOnlyFiled,
+        maxLines: maxLine,
+        minLines: minLine??1,
+        autofocus: autoFocus,
+        textInputAction: TextInputAction.next,
+        inputFormatters: inputFormatters,
+        textCapitalization: textCapitalization ?? TextCapitalization.none,
+        keyboardType: textInputType,
+        validator: validator,
+
+        decoration: InputDecoration(
+          fillColor: fillColors,
+          filled: fillColorFiled,
+          suffixIcon: suffixIconWidget,
+          prefixIcon: prefixIconWidget,
+          label: label??RichText(
+            text: TextSpan(children: [
+              TextSpan(text: labelTextNew, style:  TextStyle(color: mainColor??Colors.grey, fontSize: 15)),
+              if (isMandatory) const TextSpan(text: " *", style: TextStyle(color: Colors.red, fontSize: 16))
+            ]),
+          ),
+          hintText: hintText,
+
+          // h: TextStyle(color: Colors.grey.shade700),
+          contentPadding: contentPadding ?? const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          hintStyle:  TextStyle(fontSize: 16,color: Colors.grey.shade700),
+        //   enabledBorder: OutlineInputBorder(borderRadius:BorderRadius.circular(radius??5), borderSide:  BorderSide(color: enableBorder?Colors.grey.shade400:Colors.white)),
+        //   focusedBorder:OutlineInputBorder(borderRadius: BorderRadius.circular(radius??5), borderSide:  BorderSide(color: enableBorder?Colors.grey.shade400:Colors.white)),
+        //   disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(radius??5), borderSide:  BorderSide(color:enableBorder? Colors.grey.shade300:Colors.white)),
+        ),
+      ),
+    );
   }
 }

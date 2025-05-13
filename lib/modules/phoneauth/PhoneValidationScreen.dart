@@ -69,6 +69,7 @@ class _PhoneValidationScreenState extends State<PhoneValidationScreen>
         ),
         SafeArea(
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               elevation: 0,
               backgroundColor: AllCoustomTheme.getThemeData().colorScheme.background,

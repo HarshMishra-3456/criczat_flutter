@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.5
-  modal_progress_hud_nsn: ^0.4.0
+  modal_progress_hud_nsn: ^0.5.1
   share_plus:
   path_provider:
   win32: ^5.7.2
@@ -37,13 +37,13 @@ dependencies:
   scroll_page_view: ^1.0.2
   pinput: ^3.0.1
   image_picker: ^0.8.7+5
-  permission_handler: ^10.2.0
+  permission_handler: ^11.3.0
   geolocator:
   geocoding: ^3.0.0
   firebase_core:
   firebase_messaging:
   dartz:
-  telephony: ^0.2.0
+  sms_autofill: ^2.4.1
   flutter_svg:
   hive_flutter:
   flutter_local_notifications: ^17.2.2

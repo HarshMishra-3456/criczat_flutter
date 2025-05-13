@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pinput/pinput.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 import 'package:tempalteflutter/constance/themes.dart';
 import 'package:tempalteflutter/core/Utils/constants.dart';
 import 'package:tempalteflutter/core/localstorage/localstorage.dart';
 import 'package:tempalteflutter/modules/login/continuebutton.dart';
 import 'package:tempalteflutter/modules/phoneauth/data/authapi.dart';
-import 'package:telephony/telephony.dart';
 
 
 class OtpValidationScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class OtpValidationScreen extends StatefulWidget {
   _OtpValidationScreenState createState() => _OtpValidationScreenState();
 }
 
-class _OtpValidationScreenState extends State<OtpValidationScreen> with TickerProviderStateMixin {
+class _OtpValidationScreenState extends State<OtpValidationScreen> with TickerProviderStateMixin,CodeAutoFill {
   var isLoginProsses = false;
   late AnimationController _animationController;
   var otpText = '';
@@ -28,7 +28,6 @@ class _OtpValidationScreenState extends State<OtpValidationScreen> with TickerPr
   var otpTimerView = false;
   var otpController = TextEditingController();
 
-  final Telephony telephony = Telephony.instance;
 
   @override
   void initState() {
@@ -37,43 +36,44 @@ class _OtpValidationScreenState extends State<OtpValidationScreen> with TickerPr
       vsync: this,
       duration: Duration(milliseconds: 400),
     );
-    requestSmsPermission();
+    SmsAutoFill().listenForCode(smsCodeRegexPattern: '\\d{4}');
+    // requestSmsPermission();
   }
 
-  void requestSmsPermission() async {
-    listenForSms();
-    bool? permissionsGranted = await telephony.requestSmsPermissions;
-    if (permissionsGranted == true) {
-      listenForSms();
-    } else {
-      constToast('SMS permission is required to auto-fill OTP');
-    }
-  }
+  // void requestSmsPermission() async {
+  //   listenForSms();
+  //   bool? permissionsGranted = await telephony.requestSmsPermissions;
+  //   if (permissionsGranted == true) {
+  //     listenForSms();
+  //   } else {
+  //     constToast('SMS permission is required to auto-fill OTP');
+  //   }
+  // }
 
-  void listenForSms() {
-    telephony.listenIncomingSms(
-      onNewMessage: (SmsMessage message) {
+  // void listenForSms() {
+  //   telephony.listenIncomingSms(
+  //     onNewMessage: (SmsMessage message) {
+  //
+  //       if (message.body != null && message.body!.contains("Your OTP is:")) {
+  //         String otpCode = message.body!.split("Your OTP is:")[1].trim().substring(0, 4);
+  //         setState(() {
+  //             otpController.text = otpCode;
+  //         });
+  //       }
+  //     },
+  //     listenInBackground: false,
+  //   );
+  // }
 
-        if (message.body != null && message.body!.contains("Your OTP is:")) {
-          String otpCode = message.body!.split("Your OTP is:")[1].trim().substring(0, 4);
-          setState(() {
-              otpController.text = otpCode;
-          });
-        }
-      },
-      listenInBackground: false,
-    );
-  }
 
-
-  String extractOtpFromMessage(String message) {
-    final RegExp otpRegex = RegExp(r'\d{4}');
-    final match = otpRegex.firstMatch(message);
-    if (match != null) {
-      return match.group(0) ?? "";
-    }
-    return "";
-  }
+  // String extractOtpFromMessage(String message) {
+  //   final RegExp otpRegex = RegExp(r'\d{4}');
+  //   final match = otpRegex.firstMatch(message);
+  //   if (match != null) {
+  //     return match.group(0) ?? "";
+  //   }
+  //   return "";
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -257,6 +257,17 @@ class _OtpValidationScreenState extends State<OtpValidationScreen> with TickerPr
         ),
       ],
     );
+  }
+
+  @override
+  void codeUpdated() {
+    // TODO: implement codeUpdated
+    final code = this.code; // Get the retrieved code from the mixin
+    if (code != null && code.length >= 4) {
+      setState(() {
+        otpController.text = code;
+      });
+    }
   }
 }
 

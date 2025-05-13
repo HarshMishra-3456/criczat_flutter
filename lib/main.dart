@@ -18,10 +18,10 @@ import 'package:tempalteflutter/modules/login/loginScreen.dart';
 import 'package:tempalteflutter/modules/login/otpValidationScreen.dart';
 import 'package:tempalteflutter/modules/splash/SplashScreen.dart';
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message)async {
-  await Firebase.initializeApp();
-}
+// @pragma('vm:entry-point')
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message)async {
+//   await Firebase.initializeApp();
+// }
 
 
 void main() async {
@@ -35,11 +35,11 @@ void main() async {
         (_) => runApp(new MyApp()),
   );
 
-  await Firebase.initializeApp();
-  NotificationServices().requestNotificationPermission();
-  NotificationServices().InitNotification();
-  print(Authutilities.firebasetoken);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // await Firebase.initializeApp();
+  // NotificationServices().requestNotificationPermission();
+  // NotificationServices().InitNotification();
+  // print(Authutilities.firebasetoken);
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp( MyApp());
 }
 
@@ -56,7 +56,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    NotificationServices().firebaseInit(context);
+    // NotificationServices().firebaseInit(context);
     globals.phoneVerificationBloc = PhoneVerificationBloc(PhoneVerificationBlocState.initial());
     FirstTime.getValues();
     super.initState();

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, unnecessary_null_comparison, deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:tempalteflutter/constance/constance.dart';
 import 'package:tempalteflutter/constance/themes.dart';
@@ -11,6 +12,8 @@ import 'package:tempalteflutter/modules/contests/views/screens/contestsScreen.da
 import 'package:provider/provider.dart';
 import 'package:tempalteflutter/modules/myProfile/data/userwalletapi.dart';
 import 'package:tempalteflutter/modules/myProfile/views/provider/getuserprovider.dart';
+
+import '../../api/apiProvider.dart';
 
 class PymentScreen extends StatefulWidget {
   final String? paymetMoney;
@@ -32,6 +35,25 @@ class _PymentScreenState extends State<PymentScreen> {
   UserData userData = new UserData();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   var cashBonus = '';
+  var data;
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
+     var responce= ApiProvider().getProfile();
+    });
+    getUserData();
+  }
+
+  void getUserData() async {
+    var responseData = ApiProvider().getProfile();
+    data = responseData.data;
+
+    setState(() {});
+  }
 
 
   @override
@@ -355,23 +377,62 @@ class _PymentScreenState extends State<PymentScreen> {
                                                   BoxShadow(color: Colors.black.withOpacity(0.5), offset: Offset(0, 1), blurRadius: 5.0),
                                                 ],
                                               ),
-                                              child: InkWell(
-                                                borderRadius: new BorderRadius.circular(4.0),
-                                                onTap: () {
-                                                  clickPayment();
-                                                },
-                                                child: Center(
-                                                    child: isProsses ?  CircularProgressIndicator() :Text(
-                                                      'Add cash'.toUpperCase(),
-                                                      style: TextStyle(
-                                                        fontFamily: 'Poppins',
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.white,
-                                                        fontSize: ConstanceData.SIZE_TITLE12,
+                                              child:Consumer<GetUserDataProvider>(
+                                                  builder: (context, value, child) {
+                                                    return InkWell(
+                                                      borderRadius: new BorderRadius.circular(4.0),
+                                                      onTap: () async{
+                                                        if(paymentController.text.isNotEmpty) {
+                                                          const platform = MethodChannel('com.example.payment/sdk');
+
+                                                          String _paymentStatus = '';
+                                                          Map<String, dynamic>? _response;
+
+                                                          Future<void> _startPayment() async {
+                                                            try {
+                                                              final result = await platform.invokeMethod<Map<dynamic, dynamic>>('startPayment', {
+                                                                'payerName': '${value.cricketdata!=null?value.cricketdata!.data.fullName:"Guest001"}',
+                                                                'payerEmail': '${value.cricketdata!=null?value.cricketdata!.data.email:"info@criczat.com"}',
+                                                                'payerMobile': '${value.cricketdata!=null?value.cricketdata!.data.phone:""}',
+                                                                'amount': paymentController.text,
+                                                              });
+                                                              setState(() {
+                                                                _paymentStatus = "Success";
+                                                                _response = Map<String, dynamic>.from(result!);
+                                                                clickPayment();
+                                                              });
+                                                            } on PlatformException catch (e) {
+                                                              setState(() {
+                                                                _paymentStatus = "Failed";
+                                                                _response = {"error": e.message};
+                                                              });
+                                                            }
+                                                          }
+                                                          if(value.cricketdata==null){
+                                                            constToast("Please Provide basic Profile Detail Name & Email");
+                                                          }else if(value.cricketdata!.data.fullName==""){
+                                                            constToast("Please Provide basic Profile Detail Name & Email");
+                                                          }else if(value.cricketdata!.data.email==""){
+                                                            constToast("Please Provide basic Profile Detail Name & Email");
+                                                          }else {
+                                                            _startPayment();
+                                                          }
+                                                        }
+                                                      },
+                                                      child: Center(
+                                                          child: isProsses ?  CircularProgressIndicator() :Text(
+                                                            'Add cash'.toUpperCase(),
+                                                            style: TextStyle(
+                                                              fontFamily: 'Poppins',
+                                                              fontWeight: FontWeight.bold,
+                                                              color: Colors.white,
+                                                              fontSize: ConstanceData.SIZE_TITLE12,
+                                                            ),
+                                                          )
                                                       ),
-                                                    )
-                                                ),
-                                              ),
+                                                    );
+                                                  },
+                                              )
                                             ),
                                           ),
                                         ],

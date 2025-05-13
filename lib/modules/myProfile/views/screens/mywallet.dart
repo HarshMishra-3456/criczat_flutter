@@ -86,8 +86,8 @@ class _MyWalletState extends State<MyWallet> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            todo.image == null
-                                ? Container(
+                            todo.image == null ?
+                            Container(
                                     height: 44,
                                     width: 44,
                                     child: AvatarImage(
@@ -173,17 +173,19 @@ class _MyWalletState extends State<MyWallet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PymentScreen(
+                    onTap: () async{
+                      print(">>>>>>||||-->||||>>>>>>>");
+                     var result=await Navigator.push(context, MaterialPageRoute(builder: (context) => PymentScreen(
                             isOnlyAddMoney: true,
-                            isTruePayment: () {},
+                            isTruePayment: () {
+
+                            },
                           ),
                           fullscreenDialog: true,
                         ),
                       );
+                      // Provider.of<GetUserAllTransactionProvider>(context, listen: false)
+                      //     .gettransaction();
                     },
                     child: Container(
                       height: 50,
@@ -203,6 +205,7 @@ class _MyWalletState extends State<MyWallet> {
                   ),
                   InkWell(
                     onTap: () {
+                      print(">>>>>>||||-->||||>>>>>>>");
                       Navigator.push(
                         context,
                         MaterialPageRoute(

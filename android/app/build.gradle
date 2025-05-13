@@ -1,3 +1,13 @@
+
+/// Harsh Mishra
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -6,10 +16,6 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-}
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
@@ -27,27 +33,36 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
 android {
+    namespace "com.example.tempalteflutter"
     compileSdkVersion 34
+    ndkVersion flutter.ndkVersion
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
     defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.criczatapp"
-        multiDexEnabled true
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
-    
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
@@ -56,9 +71,15 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
+
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -67,9 +88,131 @@ flutter {
     source '../..'
 }
 
-
 dependencies {
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation files("libs/sabpaisa_release.aar")
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.2.0'
+
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+    implementation 'com.google.code.gson:gson:2.9.1'
+    implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+// required
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    compileOnly 'androidx.annotation:annotation:1.1.0'
+    implementation "androidx.core:core-ktx:1.9.0"
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'com.airbnb.android:lottie:3.4.0'
+//    implementation 'com.github.sabpaisa-android:sabpaisa:1.0.1'
 }
+
+
+//////  Old  Gradle File
+
+
+//def localProperties = new Properties()
+//def localPropertiesFile = rootProject.file('local.properties')
+//if (localPropertiesFile.exists()) {
+//    localPropertiesFile.withReader('UTF-8') { reader ->
+//        localProperties.load(reader)
+//    }
+//}
+//
+//def flutterRoot = localProperties.getProperty('flutter.sdk')
+//if (flutterRoot == null) {
+//    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+//}
+//
+//def keystoreProperties = new Properties()
+//def keystorePropertiesFile = rootProject.file('key.properties')
+//if (keystorePropertiesFile.exists()) {
+//    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+//}
+//
+//def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+//if (flutterVersionCode == null) {
+//    flutterVersionCode = '1'
+//}
+//
+//def flutterVersionName = localProperties.getProperty('flutter.versionName')
+//if (flutterVersionName == null) {
+//    flutterVersionName = '1.0'
+//}
+//
+//apply plugin: 'com.android.application'
+//apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'kotlin-android'
+//apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+//
+//android {
+//    compileSdkVersion 34
+//    namespace "com.example.tempalteflutter"
+//    sourceSets {
+//        main.java.srcDirs += 'src/main/kotlin'
+//    }
+//
+//    defaultConfig {
+//        applicationId "com.criczatapp"
+//        multiDexEnabled true
+//        minSdkVersion 24
+//        targetSdkVersion flutter.targetSdkVersion
+//        versionCode flutterVersionCode.toInteger()
+//        versionName flutterVersionName
+//    }
+//
+//    signingConfigs {
+//        release {
+//            keyAlias keystoreProperties['keyAlias']
+//            keyPassword keystoreProperties['keyPassword']
+//            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+//            storePassword keystoreProperties['storePassword']
+//        }
+//    }
+//    buildTypes {
+//        release {
+//            signingConfig signingConfigs.release
+//        }
+//    }
+//}
+//
+//flutter {
+//    source '../..'
+//}
+//
+//
+//dependencies {
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+//    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+//    implementation("com.google.firebase:firebase-analytics")
+//    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+//    implementation files("libs/sabpaisa_release.aar")
+//    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.2.0'
+//
+//
+//    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+//    implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
+//    implementation 'androidx.multidex:multidex:2.0.1'
+//    implementation 'com.google.android.material:material:1.7.0'
+//    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+//    implementation 'com.squareup.picasso:picasso:2.5.2'
+//    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+//    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+//    implementation 'com.google.code.gson:gson:2.9.1'
+//    implementation("com.squareup.okhttp3:okhttp:4.9.2")
+//    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+//// required
+//    implementation 'androidx.appcompat:appcompat:1.5.1'
+//    compileOnly 'androidx.annotation:annotation:1.1.0'
+//    implementation "androidx.core:core-ktx:1.9.0"
+//    implementation 'commons-codec:commons-codec:1.15'
+//    implementation 'com.airbnb.android:lottie:3.4.0'
+//}

@@ -1,12 +1,16 @@
 buildscript {
-    ext.kotlin_version = '1.8.10'
+    ext.kotlin_version = '1.8.22'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        maven { url 'https://jitpack.io'
+            credentials { username 'jp_oshtn4lfqhsnjr688utjov34gq' }
+        }
+
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.android.tools.build:gradle:8.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.15'
     }
@@ -15,13 +19,18 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        maven { url 'https://jitpack.io'
+            credentials { username 'jp_oshtn4lfqhsnjr688utjov34gq' }
+        }
     }
 }
 
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
     project.evaluationDependsOn(':app')
 }
 
