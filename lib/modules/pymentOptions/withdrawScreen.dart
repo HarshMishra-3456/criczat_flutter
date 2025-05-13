@@ -337,11 +337,14 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                             }else if(paymentController.text.isEmpty){
                                                               constToast("Please Enter Amount");
 
-                                                            }else if((double.parse(paymentController.text)<=200 && double.parse(paymentController.text)>=10000) ){
+                                                            }else if(double.parse(paymentController.text)<200){
 
                                                               constToast("Please Enter Valid Amount");
-                                                              print(double.parse(paymentController.text)>=200);
-                                                              print(double.parse(paymentController.text)<=10000);
+                                                              print(double.parse(paymentController.text)<200);
+
+                                                            }else if(double.parse(paymentController.text)>10000){
+                                                              constToast("Please Enter Valid Amount");
+                                                              print(double.parse(paymentController.text)>10000);
                                                             }
                                                             else if(double.parse(value.cricketdata!.data.wallet is String?value.cricketdata!.data.wallet:"${value.cricketdata!.data.wallet}")<=double.parse(paymentController.text)){
                                                               constToast("you don't have  valid  wallet amount");
@@ -351,7 +354,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                               constToast("you don't have  valid  wallet amount");
 
                                                             }else {
-                                                              getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');
+                                                              constToast("Success");
+                                                              // getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');
                                                             }
                                                           },
                                                           child: Center(
@@ -519,7 +523,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
     http.StreamedResponse response = await request.send();
     var responceJsonString=await response.stream.bytesToString();
-
+    print(responceJsonString);
     var responceMap=jsonDecode(responceJsonString);
     print(responceJsonString);
     if (response.statusCode == 200) {
