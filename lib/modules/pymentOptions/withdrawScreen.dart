@@ -350,9 +350,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                               constToast("you don't have  valid  wallet amount");
 
                                                             }
-                                                            else if((double.parse(value.cricketdata!.data.wallet is String?value.cricketdata!.data.wallet:"${value.cricketdata!.data.wallet}")-double.parse(paymentController.text)).isNegative){
-                                                              constToast("you don't have  valid  wallet amount");
-
+                                                            else if((double.parse(value.cricketdata!.data.wallet is String?value.cricketdata!.data.wallet:"${value.cricketdata!.data.wallet}")-double.parse(paymentController.text))<200){
+                                                              constToast("you don't have  valid  wallet amount : Minimum ₹200 is required to be in wallet");
                                                             }else {
                                                               // constToast("Success");
                                                               getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');

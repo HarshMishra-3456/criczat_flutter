@@ -408,7 +408,9 @@ class _PymentScreenState extends State<PymentScreen> {
                                                               });
                                                             }
                                                           }
-                                                          if(value.cricketdata==null){
+                                                         if(double.parse(paymentController.text)<50){
+                                                           constToast("Amount sholdnot be less than 50");
+                                                         }else if(value.cricketdata==null){
                                                             constToast("Please Provide basic Profile Detail Name & Email");
                                                           }else if(value.cricketdata!.data.fullName==""){
                                                             constToast("Please Provide basic Profile Detail Name & Email");
