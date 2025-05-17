@@ -354,7 +354,14 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                               constToast("you don't have  valid  wallet amount : Minimum ₹200 is required to be in wallet");
                                                             }else {
                                                               // constToast("Success");
-                                                              getWithDrawAmount('${value.cricketdata!=null?value.cricketdata!.data.phone:""}');
+
+                                                              if(!isProsses) {
+                                                                isProsses=true;
+                                                                setState(() {});
+                                                                getWithDrawAmount('${value.cricketdata != null ? value.cricketdata!.data.phone : ""}');
+                                                              }else{
+                                                                constToast("Please wait..");
+                                                              }
                                                             }
                                                           },
                                                           child: Center(
@@ -520,31 +527,34 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     });
     request.headers.addAll(headers);
 
-    http.StreamedResponse response = await request.send();
-    var responceJsonString=await response.stream.bytesToString();
-    print(responceJsonString);
-    var responceMap=jsonDecode(responceJsonString);
-    print(responceJsonString);
-    if (response.statusCode == 200) {
-     if(responceMap["status"]=="success"){
-       PreferenceManager.instance.setString("BANK", jsonEncode({
-         "name": nameController.text,
-         "account_number": accNoController.text,
-         "ifsc": ifscController.text,
-         "bank_name": bankNameController.text,
-         "upi_id": upiIDController.text,
-         "amount": paymentController.text,
-         "phone_number":phoneNo
-       }));
-      constToast("Success: ${responceMap["message"]}");
-      clickPayment();
-
-     }else{
-       constToast("Error :${responceMap["message"]}");
-     }
-    }
-    else {
-      constToast("Something went wrong");
+    try {
+      http.StreamedResponse response = await request.send();
+      var responceJsonString = await response.stream.bytesToString();
+      print(responceJsonString);
+      var responceMap = jsonDecode(responceJsonString);
+      print(responceJsonString);
+      if (response.statusCode == 200) {
+        if (responceMap["status"] == "success") {
+          PreferenceManager.instance.setString("BANK", jsonEncode({
+            "name": nameController.text,
+            "account_number": accNoController.text,
+            "ifsc": ifscController.text,
+            "bank_name": bankNameController.text,
+            "upi_id": upiIDController.text,
+            "amount": paymentController.text,
+            "phone_number": phoneNo
+          }));
+          constToast("Success: ${responceMap["message"]}");
+          clickPayment();
+        } else {
+          constToast("Error :${responceMap["message"]}");
+        }
+      }
+      else {
+        constToast("Something went wrong");
+      }
+    }catch(e){
+      constToast("$e");
     }
 
   }
@@ -571,7 +581,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       // ifscController.clear();
       // bankNameController.clear();
       // upiIDController.clear();
-      // paymentController.clear();
+      paymentController.clear();
     }else{
       constToast('Enter The Amount');
     }
